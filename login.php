@@ -1,27 +1,15 @@
 <?php
 session_start();
-include 'includes/config.php';
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+include '../includes/config.php'; // Adjust path because admin is in a subfolder
 
 $message = "";
-
-// Show message if redirected from registration
-if (isset($_GET['registered']) && $_GET['registered'] == 1) {
-    $message = "Registration successful. You can now login.";
-}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM users WHERE email = '$email'";
+    $sql = "SELECT * FROM users WHERE email = '$email' AND role='admin'";
     $result = mysqli_query($conn, $sql);
-
-    if (!$result) {
-        die("Database error: " . mysqli_error($conn));
-    }
 
     if (mysqli_num_rows($result) == 1) {
         $user = mysqli_fetch_assoc($result);
@@ -31,28 +19,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['fullname'] = $user['fullname'];
             $_SESSION['role'] = $user['role'];
 
-            if ($user['role'] === 'admin') {
-                header("Location: admin/index.php");
-                exit();
-            } else {
-                header("Location: dashboard.php");
-                exit();
-            }
+            header("Location: index.php"); // redirect to admin dashboard
+            exit();
         } else {
             $message = "Incorrect password.";
         }
     } else {
-        $message = "No account found with that email.";
+        $message = "No admin account found with that email.";
     }
 }
 ?>
 
-<?php include 'includes/header.php'; ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - MzansiLink</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">MzansiLink</div>
+    <div class="nav-links">
+        <a href="../index.php">Home</a>
+        <a href="../browse.php">Browse</a>
+        <a href="../dashboard.php">Dashboard</a>
+        <a href="../register.php" class="btn-small">Register</a>
+        <a href="../login.php">Login</a>
+    </div>
+</nav>
 
 <section class="form-section">
     <div class="form-box">
-        <p class="section-tag">Welcome back</p>
-        <h1>Login to MzansiLink</h1>
+        <p class="section-tag">Admin Login</p>
+        <h1>Login as Admin</h1>
 
         <?php if ($message != "") { ?>
             <p class="message"><?php echo $message; ?></p>
@@ -60,18 +62,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <form method="POST">
             <label>Email Address</label>
-            <input type="email" name="email" placeholder="Enter your email" required>
+            <input type="email" name="email" placeholder="Enter admin email" required>
 
             <label>Password</label>
-            <input type="password" name="password" placeholder="Enter your password" required>
+            <input type="password" name="password" placeholder="Enter password" required>
 
             <button type="submit" class="btn-form">Login</button>
         </form>
-
-        <p class="form-link">
-            Don’t have an account? <a href="register.php">Register here</a>
-        </p>
     </div>
 </section>
 
-<?php include 'includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>
+</body>
+</html>

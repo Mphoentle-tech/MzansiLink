@@ -1,47 +1,34 @@
 <?php
-include 'includes/config.php';
-include 'includes/header.php';
-
-// Fetch featured products dynamically
-$sql = "SELECT * FROM products WHERE featured = 1 ORDER BY id DESC";
-$result = mysqli_query($conn, $sql);
+include '../includes/auth.php';
+adminOnly(); // Restrict to admin
+include '../includes/config.php';
+include '../includes/header.php';
 ?>
 
-<section class="hero">
-    <div class="hero-text">
-        <p class="tagline">Township-powered online marketplace</p>
-        <h1>Buy and sell trusted goods in your community.</h1>
-        <p class="hero-description">
-            MzansiLink connects local buyers and sellers through a simple,
-            secure and community-focused C2C marketplace.
-        </p>
-        <div class="hero-buttons">
-            <a href="browse.php" class="btn-primary">Browse Products</a>
-            <a href="register.php" class="btn-secondary">Start Selling</a>
+<section class="page-header">
+    <p class="section-tag">Admin Panel</p>
+    <h1>MzansiLink Admin Dashboard</h1>
+    <p>Manage users, products and platform activity using role-based access control.</p>
+</section>
+
+<section class="dashboard-section">
+    <div class="dashboard-grid">
+        <div class="dashboard-card">
+            <h3>Total Users</h3>
+            <p><?php echo $user_count['total']; ?> registered users</p>
+            <a href="users.php" class="btn-primary">Manage Users</a>
+        </div>
+        <div class="dashboard-card">
+            <h3>Total Products</h3>
+            <p><?php echo $product_count['total']; ?> products listed</p>
+            <a href="products.php" class="btn-primary">Manage Products</a>
+        </div>
+        <div class="dashboard-card">
+            <h3>Access Control</h3>
+            <p>Only admin users can access this management area.</p>
+            <a href="../dashboard.php" class="btn-primary">User Dashboard</a>
         </div>
     </div>
 </section>
 
-<section class="featured">
-    <p class="section-tag">Popular listings</p>
-    <h2>Featured Products</h2>
-
-    <div class="product-grid">
-
-        <?php if(mysqli_num_rows($result) > 0): ?>
-            <?php while($row = mysqli_fetch_assoc($result)): ?>
-                <div class="product-card">
-                    <img src="uploads/<?php echo $row['image']; ?>" class="product-photo">
-                    <h3><?php echo $row['title']; ?></h3>
-                    <p><?php echo $row['description']; ?></p>
-                    <span>R<?php echo $row['price']; ?></span>
-                </div>
-            <?php endwhile; ?>
-        <?php else: ?>
-            <p class="no-results">No featured products found.</p>
-        <?php endif; ?>
-
-    </div>
-</section>
-
-<?php include 'includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>
